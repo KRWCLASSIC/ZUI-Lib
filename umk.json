@@ -1,0 +1,47 @@
+{
+  "umk": "0.1.2",
+  "name": "ZUI",
+  "shell": "cmd",
+  "variables": {
+    "configuration": "Debug",
+    "steamId": "3121110",
+    "game": "E:\\SteamLibrary\\steamapps\\common\\Zort",
+    "gameExe": "Zort.exe",
+    "plugins": "${game}\\BepInEx\\plugins",
+    "output": "bin\\${configuration}\\netstandard2.1"
+  },
+  "scripts": {
+    "kill": [
+      "taskkill /F /IM \"${gameExe}\" >nul 2>&1 || ver >nul"
+    ],
+    "compile": [
+      "dotnet build ZUI.csproj -c ${configuration}"
+    ],
+    "copy": [
+      "if not exist \"${plugins}\" mkdir \"${plugins}\"",
+      "if exist \"${plugins}\\ZUI.dll\" del /F /Q \"${plugins}\\ZUI.dll\"",
+      "copy /Y \"${output}\\ZUI-Lib.dll\" \"${plugins}\""
+    ],
+    "uninstall": [
+      "if exist \"${plugins}\\ZUI-Lib.dll\" del /F /Q \"${plugins}\\ZUI-Lib.dll\"",
+      "if exist \"${plugins}\\ZUI.dll\" del /F /Q \"${plugins}\\ZUI.dll\""
+    ],
+    "build": [
+      "compile",
+      "copy"
+    ],
+    "run": [
+      "kill",
+      "build",
+      "start \"\" \"steam://rungameid/${steamId}\""
+    ],
+    "modlessrun": [
+      "kill",
+      "uninstall",
+      "start \"\" \"steam://rungameid/${steamId}\""
+    ],
+    "clean": [
+      "dotnet clean"
+    ]
+  }
+}

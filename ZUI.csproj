@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>ZUI-Lib</AssemblyName>
+    <RootNamespace>ZUI</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="src\Example\sprites\*.png" />
+  </ItemGroup>
+  <ItemGroup Label="UMKGameLibs">
+    <Reference Include="libs\bepinex\0Harmony.dll" Private="False" />
+    <Reference Include="libs\bepinex\BepInEx*.dll" Private="False" />
+    <Reference Include="libs\managed\*.dll" Private="False" />
+    <Reference Remove="libs\managed\mscorlib.dll" />
+    <Reference Remove="libs\managed\netstandard.dll" />
+    <Reference Remove="libs\managed\WindowsBase.dll" />
+    <Reference Remove="libs\managed\Accessibility.dll" />
+    <Reference Remove="libs\managed\nunit.framework.dll" />
+    <Reference Remove="libs\managed\System*.dll" />
+    <Reference Remove="libs\managed\Mono*.dll" />
+    <Reference Remove="libs\managed\Microsoft*.dll" />
+    <Reference Remove="libs\managed\I18N*.dll" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,17 @@
+# Build output
+bin/
+obj/
+
+# UMK junctions to local game directory
+libs/
+
+# IDE & Editor files
+.vs/
+.idea/
+*.user
+*.suo
+
+# Backup & archives
+*.bak
+*.zip
+
