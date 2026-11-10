@@ -1,5 +1,5 @@
 {
-  "umk": "0.1.2",
+  "umk": "0.1.3",
   "name": "ZUI",
   "shell": "cmd",
   "variables": {
@@ -8,7 +8,8 @@
     "game": "E:\\SteamLibrary\\steamapps\\common\\Zort",
     "gameExe": "Zort.exe",
     "plugins": "${game}\\BepInEx\\plugins",
-    "output": "bin\\${configuration}\\netstandard2.1"
+    "output": "bin\\${configuration}\\netstandard2.1",
+    "version": "$[script:*get-version]"
   },
   "scripts": {
     "kill": [
@@ -16,6 +17,9 @@
     ],
     "compile": [
       "dotnet build ZUI.csproj -c ${configuration}"
+    ],
+    "compile-example": [
+      "dotnet build ZUI.csproj -c ${configuration} -p:IncludeExamples=true"
     ],
     "copy": [
       "if not exist \"${plugins}\" mkdir \"${plugins}\"",
@@ -27,18 +31,56 @@
       "if exist \"${plugins}\\ZUI.dll\" del /F /Q \"${plugins}\\ZUI.dll\""
     ],
     "build": [
-      "compile",
-      "copy"
+      "@compile",
+      "@copy"
+    ],
+    "build-example": [
+      "@compile-example",
+      "@copy"
     ],
     "run": [
-      "kill",
-      "build",
+      "@kill",
+      "@build",
+      "start \"\" \"steam://rungameid/${steamId}\""
+    ],
+    "run-example": [
+      "@kill",
+      "@build-example",
       "start \"\" \"steam://rungameid/${steamId}\""
     ],
     "modlessrun": [
-      "kill",
-      "uninstall",
+      "@kill",
+      "@uninstall",
       "start \"\" \"steam://rungameid/${steamId}\""
+    ],
+    "*get-version": [
+      "powershell -NoProfile -Command \"(Get-Content src\\PluginInfo.cs | Select-String 'PLUGIN_VERSION').Line.Split([char]34)[1].Trim()\""
+    ],
+    "*pack-stage": [
+      "if not exist \"dist\" mkdir \"dist\"",
+      "@*pack-clean",
+      "mkdir \"dist\\staging\\BepInEx\\plugins\"",
+      "copy /Y \"${output}\\ZUI-Lib.dll\" \"dist\\staging\\BepInEx\\plugins\\\"",
+      "copy /Y \"resources\\manifest.json\" \"dist\\staging\\\"",
+      "copy /Y \"resources\\CHANGELOG.md\" \"dist\\staging\\\"",
+      "if exist \"resources\\icon.png\" copy /Y \"resources\\icon.png\" \"dist\\staging\\\"",
+      "if exist \"README.md\" copy /Y \"README.md\" \"dist\\staging\\\""
+    ],
+    "*pack-manifest": [
+      "powershell -NoProfile -Command \"(Get-Content 'dist\\staging\\manifest.json') -replace '.*version_number.*', ('    ' + [char]34 + 'version_number' + [char]34 + ': ' + [char]34 + '${version}' + [char]34 + ',') | Set-Content 'dist\\staging\\manifest.json'\""
+    ],
+    "*pack-archive": [
+      "powershell -NoProfile -Command \"Compress-Archive -Path 'dist\\staging\\*' -DestinationPath 'dist\\krw-ZUI_Lib-${version}.zip' -Force\""
+    ],
+    "*pack-clean": [
+      "if exist \"dist\\staging\" rmdir /S /Q \"dist\\staging\""
+    ],
+    "pack": [
+      "@compile",
+      "@*pack-stage",
+      "@*pack-manifest",
+      "@*pack-archive",
+      "@*pack-clean"
     ],
     "clean": [
       "dotnet clean"

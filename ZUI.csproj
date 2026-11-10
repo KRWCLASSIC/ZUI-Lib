@@ -6,9 +6,13 @@
     <LangVersion>latest</LangVersion>
     <Nullable>disable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <IncludeExamples Condition="'$(IncludeExamples)' == ''">false</IncludeExamples>
   </PropertyGroup>
-  <ItemGroup>
+  <ItemGroup Condition="'$(IncludeExamples)' == 'true'">
     <EmbeddedResource Include="src\Example\sprites\*.png" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IncludeExamples)' != 'true'">
+    <Compile Remove="src\Example\**" />
   </ItemGroup>
   <ItemGroup Label="UMKGameLibs">
     <Reference Include="libs\bepinex\0Harmony.dll" Private="False" />
