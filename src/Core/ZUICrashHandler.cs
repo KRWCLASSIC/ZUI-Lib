@@ -158,7 +158,7 @@ namespace ZUI.Core
 
         private static void EnqueueOrShowPopup(PendingCrashReport report)
         {
-            if (InitUI.PopupManager != null)
+            if (StaticInstance<InitUI>.Instance != null && InitUI.PopupManager != null)
             {
                 ShowCrashPopup(report);
             }
@@ -170,7 +170,7 @@ namespace ZUI.Core
 
         internal static void FlushPendingPopups()
         {
-            if (InitUI.PopupManager == null) return;
+            if (StaticInstance<InitUI>.Instance == null || InitUI.PopupManager == null) return;
 
             while (_pendingReports.Count > 0)
             {

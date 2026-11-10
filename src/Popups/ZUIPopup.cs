@@ -74,6 +74,7 @@ namespace ZUI.Popups
         {
             get
             {
+                if (StaticInstance<InitUI>.Instance == null) return 0;
                 var manager = InitUI.PopupManager;
                 return manager != null ? manager.GetPopupCount : 0;
             }
@@ -95,11 +96,12 @@ namespace ZUI.Popups
                 throw new ArgumentNullException(nameof(options));
             }
 
-            var manager = InitUI.PopupManager;
-            if (manager == null)
+            if (StaticInstance<InitUI>.Instance == null || InitUI.PopupManager == null)
             {
                 throw new InvalidOperationException("[ZUI] InitUI.PopupManager is not initialized yet. Popups require the game UI system to be loaded.");
             }
+
+            var manager = InitUI.PopupManager;
 
             // 1. Select the native template to use as base
             AllPopups baseType;
@@ -798,6 +800,7 @@ namespace ZUI.Popups
         /// </summary>
         public static void CloseAll()
         {
+            if (StaticInstance<InitUI>.Instance == null) return;
             var manager = InitUI.PopupManager;
             if (manager == null) return;
 

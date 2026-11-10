@@ -55,7 +55,7 @@ namespace ZUI.Example
             // Standalone Toggle (Simple callback)
             ZUISettings.AddToggle(
                 id: "zui_example_toggle_raw",
-                label: "Example Toggle (Callback)",
+                label: "Quick Toggle",
                 defaultValue: true,
                 onApply: val => Plugin.Log.LogInfo($"[ZUI Example] Toggle applied: {val}")
             );
@@ -63,7 +63,7 @@ namespace ZUI.Example
             // Real BepInEx Config Toggle
             ZUISettings.AddToggle(
                 id: "mymod_autoheal",
-                label: "Auto-Heal (Real BepInEx Config)",
+                label: "Auto-Heal",
                 defaultValue: autoHeal.Value,
                 onApply: val =>
                 {
@@ -133,7 +133,7 @@ namespace ZUI.Example
             // Real BepInEx Config Slider
             ZUISettings.AddSlider(
                 id: "mymod_fov",
-                label: "FOV Slider (Real BepInEx Config)",
+                label: "Field of View",
                 minValue: 60f,
                 maxValue: 120f,
                 defaultValue: fovConfig.Value,
@@ -169,7 +169,7 @@ namespace ZUI.Example
             // Real BepInEx Config Enum Dropdown
             ZUISettings.AddDropdown<ExampleQualityPreset>(
                 id: "mymod_quality_preset",
-                label: "Quality Preset (Real BepInEx Config)",
+                label: "Quality Preset",
                 defaultValue: qualityConfig.Value,
                 onApply: val =>
                 {
