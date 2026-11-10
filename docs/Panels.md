@@ -74,36 +74,30 @@ All `Add*` methods return the created item, so you can keep it and change it lat
 ### Toggle
 
 ```csharp
-ToggleSettingItem AddToggle(ConfigEntry<bool> configEntry, string label = null, Action<bool> onApply = null, Action<bool> onChanged = null)
 ToggleSettingItem AddToggle(string id, string label, bool defaultValue, Action<bool> onApply = null, Action<bool> onChanged = null)
 ```
 
-- With a `ConfigEntry`, the value is read from and written to the entry on apply.
 - `onChanged` fires when the user changes the value. `onApply` fires when the change is applied.
-- `ToggleSettingItem` members: `Id`, `Label`, `CurrentValue`, `PendingValue`, `ConfigEntry`, `OnApply`, `OnChanged`, `HasPendingChanges`, `SpawnedObject`.
+- `ToggleSettingItem` members: `Id`, `Label`, `CurrentValue`, `PendingValue`, `OnApply`, `OnChanged`, `HasPendingChanges`, `SpawnedObject`.
 
 ### Slider
 
 ```csharp
-SliderSettingItem AddSlider(ConfigEntry<float> configEntry, float minValue, float maxValue, bool wholeNumbers = false, string label = null, Func<float, string> valueFormatter = null, Action<float> onApply = null, Action<float> onChanged = null)
-SliderSettingItem AddSlider(ConfigEntry<int> configEntry, int minValue, int maxValue, string label = null, Func<float, string> valueFormatter = null, Action<float> onApply = null, Action<float> onChanged = null)
 SliderSettingItem AddSlider(string id, string label, float minValue, float maxValue, float defaultValue, bool wholeNumbers = false, Func<float, string> valueFormatter = null, Action<float> onApply = null, Action<float> onChanged = null)
 ```
 
 - `valueFormatter` turns the slider value into the displayed text.
-- `SliderSettingItem` members: `Id`, `Label`, `MinValue`, `MaxValue`, `WholeNumbers`, `ValueFormatter`, `CurrentValue`, `PendingValue`, `ConfigEntry`, `IntConfigEntry`, `OnApply`, `OnChanged`, `HasPendingChanges`, `SpawnedObject`.
+- `SliderSettingItem` members: `Id`, `Label`, `MinValue`, `MaxValue`, `WholeNumbers`, `ValueFormatter`, `CurrentValue`, `PendingValue`, `OnApply`, `OnChanged`, `HasPendingChanges`, `SpawnedObject`.
 
 ### Dropdown
 
 ```csharp
 DropdownSettingItem AddDropdown(string id, string label, IList<string> options, int defaultIndex = 0, Action<int> onApply = null, Action<int> onChanged = null)
-DropdownSettingItem AddDropdown(ConfigEntry<string> configEntry, IList<string> options, string label = null, Action<int> onApply = null, Action<int> onChanged = null)
-DropdownSettingItem AddDropdown(ConfigEntry<int> configEntry, IList<string> options, string label = null, Action<int> onApply = null, Action<int> onChanged = null)
-DropdownSettingItem AddDropdown<TEnum>(ConfigEntry<TEnum> configEntry, string label = null, Action<TEnum> onApply = null, Action<TEnum> onChanged = null) where TEnum : struct, Enum
+DropdownSettingItem AddDropdown<TEnum>(string id, string label, TEnum defaultValue = default, Action<TEnum> onApply = null, Action<TEnum> onChanged = null) where TEnum : struct, Enum
 ```
 
 - Callbacks receive the selected index. The enum overload receives the `TEnum` value instead.
-- `DropdownSettingItem` members: `Id`, `Label`, `Options`, `CurrentIndex`, `PendingIndex`, `StringConfigEntry`, `IntConfigEntry`, `OnApply`, `OnChanged`, `HasPendingChanges`, `SpawnedObject`.
+- `DropdownSettingItem` members: `Id`, `Label`, `Options`, `CurrentIndex`, `PendingIndex`, `OnApply`, `OnChanged`, `HasPendingChanges`, `SpawnedObject`.
 
 ### Header
 

@@ -17,12 +17,22 @@ ZUI injects custom items into the vanilla Zort settings screen. Items are regist
 
 These calls are driven by Harmony patches on `InitUI.ApplyChanges_Btn`, `InitUI.RevertAllChanges`, `InitUI.OpenSettings_Btn` and `ButtonFunctions.OpenSettings_Btn`.
 
-## Items without a ConfigEntry vs with one
+## Item Identity & Persistence
 
-- With an `id`: standalone item, no persistence. Use `onApply` to store the value yourself.
-- With a `ConfigEntry`: the id is derived (`ZUI_Toggle_<Section>_<Key>`, `ZUI_Slider_...`, `ZUI_Dropdown_...`), the initial value is read from the entry, and the entry is saved on apply. If `label` is null or empty, the entry key is used as label.
+- All settings items are standalone and decoupled from configuration files.
+- Each item requires a unique `id`. An item is only instantiated if no child with the same name already exists in the settings content.
+- To persist values, mod developers read their mod's config value into `defaultValue` upon registration and save to their config file inside `onApply`.
 
-Item ids must be unique. An item is only instantiated if no child with the same name already exists in the settings content.
+```csharp
+// Example: Connecting your mod's BepInEx ConfigFile
+var godMode = Config.Bind("General", "GodMode", false, "Invulnerability");
+
+ZUISettings.AddToggle("mymod_godmode", "God Mode", godMode.Value, onApply: val =>
+{
+    godMode.Value = val;
+    Config.Save(); // Saves to BepInEx/config/YourMod.cfg
+});
+```
 
 ## ZUISettings
 
@@ -59,36 +69,25 @@ void AddItem(ISettingItem item)
 ### Toggle
 
 ```csharp
-ToggleSettingItem AddToggle(ConfigEntry<bool> configEntry, string label = null, Action<bool> onApply = null, Action<bool> onChanged = null)
 ToggleSettingItem AddToggle(string id, string label, bool defaultValue, Action<bool> onApply = null, Action<bool> onChanged = null)
 ```
 
 ### Slider
 
 ```csharp
-SliderSettingItem AddSlider(ConfigEntry<float> configEntry, float minValue, float maxValue, bool wholeNumbers = false, string label = null,
-    Func<float, string> valueFormatter = null, Action<float> onApply = null, Action<float> onChanged = null)
-
-SliderSettingItem AddSlider(ConfigEntry<int> configEntry, int minValue, int maxValue, string label = null,
-    Func<float, string> valueFormatter = null, Action<float> onApply = null, Action<float> onChanged = null)
-
 SliderSettingItem AddSlider(string id, string label, float minValue, float maxValue, float defaultValue, bool wholeNumbers = false,
     Func<float, string> valueFormatter = null, Action<float> onApply = null, Action<float> onChanged = null)
 ```
 
-- The `int` overload always uses whole numbers and rounds the value when writing the entry.
 - Without `valueFormatter`, the value is shown as `0` (whole numbers) or `0.00`.
 
 ### Dropdown
 
 ```csharp
 DropdownSettingItem AddDropdown(string id, string label, IList<string> options, int defaultIndex = 0, Action<int> onApply = null, Action<int> onChanged = null)
-DropdownSettingItem AddDropdown(ConfigEntry<string> configEntry, IList<string> options, string label = null, Action<int> onApply = null, Action<int> onChanged = null)
-DropdownSettingItem AddDropdown(ConfigEntry<int> configEntry, IList<string> options, string label = null, Action<int> onApply = null, Action<int> onChanged = null)
-DropdownSettingItem AddDropdown<TEnum>(ConfigEntry<TEnum> configEntry, string label = null, Action<TEnum> onApply = null, Action<TEnum> onChanged = null) where TEnum : struct, Enum
+DropdownSettingItem AddDropdown<TEnum>(string id, string label, TEnum defaultValue = default, Action<TEnum> onApply = null, Action<TEnum> onChanged = null) where TEnum : struct, Enum
 ```
 
-- `ConfigEntry<string>` stores the selected option text, `ConfigEntry<int>` stores the index.
 - The enum overload uses the enum names as options and the callbacks receive the enum value.
 - The item creates its dropdown from the game's template and throws `InvalidOperationException` on instantiate if no dropdown template exists in the settings screen.
 

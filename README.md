@@ -33,6 +33,7 @@ umk setup
 - `umk run-example` - builds with showcase examples and launches Zort
 - `umk build` - compiles clean library and copies DLL to BepInEx plugins
 - `umk build-example` - compiles with showcase examples and copies DLL to plugins
+- `umk pack` - builds clean release and packages Thunderstore zip into `dist/`
 - `umk modlessrun` - launches clean vanilla Zort
 - `umk compile` - builds the project
 - `umk clean` - cleans build files
