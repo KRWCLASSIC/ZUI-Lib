@@ -1,5 +1,4 @@
 using System;
-using BepInEx.Configuration;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -23,8 +22,6 @@ namespace ZUI.Settings
 
         public bool HasPendingChanges => Math.Abs(CurrentValue - PendingValue) > 0.0001f;
 
-        public ConfigEntry<float> ConfigEntry { get; }
-        public ConfigEntry<int> IntConfigEntry { get; }
         public Action<float> OnApply { get; set; }
         public Action<float> OnChanged { get; set; }
 
@@ -51,51 +48,6 @@ namespace ZUI.Settings
             CurrentValue = defaultValue;
             PendingValue = defaultValue;
             ValueFormatter = valueFormatter ?? (v => wholeNumbers ? v.ToString("0") : v.ToString("0.00"));
-            OnApply = onApply;
-            OnChanged = onChanged;
-        }
-
-        public SliderSettingItem(
-            ConfigEntry<float> configEntry,
-            float minValue,
-            float maxValue,
-            bool wholeNumbers = false,
-            string label = null,
-            Func<float, string> valueFormatter = null,
-            Action<float> onApply = null,
-            Action<float> onChanged = null)
-        {
-            ConfigEntry = configEntry;
-            Id = "ZUI_Slider_" + configEntry.Definition.Section + "_" + configEntry.Definition.Key;
-            Label = string.IsNullOrEmpty(label) ? configEntry.Definition.Key : label;
-            MinValue = minValue;
-            MaxValue = maxValue;
-            WholeNumbers = wholeNumbers;
-            CurrentValue = configEntry.Value;
-            PendingValue = configEntry.Value;
-            ValueFormatter = valueFormatter ?? (v => wholeNumbers ? v.ToString("0") : v.ToString("0.00"));
-            OnApply = onApply;
-            OnChanged = onChanged;
-        }
-
-        public SliderSettingItem(
-            ConfigEntry<int> configEntry,
-            int minValue,
-            int maxValue,
-            string label = null,
-            Func<float, string> valueFormatter = null,
-            Action<float> onApply = null,
-            Action<float> onChanged = null)
-        {
-            IntConfigEntry = configEntry;
-            Id = "ZUI_Slider_" + configEntry.Definition.Section + "_" + configEntry.Definition.Key;
-            Label = string.IsNullOrEmpty(label) ? configEntry.Definition.Key : label;
-            MinValue = minValue;
-            MaxValue = maxValue;
-            WholeNumbers = true;
-            CurrentValue = configEntry.Value;
-            PendingValue = configEntry.Value;
-            ValueFormatter = valueFormatter ?? (v => v.ToString("0"));
             OnApply = onApply;
             OnChanged = onChanged;
         }
@@ -173,16 +125,6 @@ namespace ZUI.Settings
             if (HasPendingChanges)
             {
                 CurrentValue = PendingValue;
-                if (ConfigEntry != null)
-                {
-                    ConfigEntry.Value = CurrentValue;
-                    ConfigEntry.ConfigFile?.Save();
-                }
-                if (IntConfigEntry != null)
-                {
-                    IntConfigEntry.Value = Mathf.RoundToInt(CurrentValue);
-                    IntConfigEntry.ConfigFile?.Save();
-                }
                 OnApply?.Invoke(CurrentValue);
             }
         }

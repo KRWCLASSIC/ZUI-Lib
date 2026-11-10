@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using BepInEx.Configuration;
 using TMPro;
 using UnityEngine;
 using ZUI.Core;
@@ -72,21 +71,6 @@ namespace ZUI.Settings
         #region Toggle Widgets
 
         public ToggleSettingItem AddToggle(
-            ConfigEntry<bool> configEntry,
-            string label = null,
-            Action<bool> onApply = null,
-            Action<bool> onChanged = null)
-        {
-            var item = new ToggleSettingItem(configEntry, label, onApply, val =>
-            {
-                onChanged?.Invoke(val);
-                NotifyChangesMade();
-            });
-            AddItem(item);
-            return item;
-        }
-
-        public ToggleSettingItem AddToggle(
             string id,
             string label,
             bool defaultValue,
@@ -105,43 +89,6 @@ namespace ZUI.Settings
         #endregion
 
         #region Slider Widgets
-
-        public SliderSettingItem AddSlider(
-            ConfigEntry<float> configEntry,
-            float minValue,
-            float maxValue,
-            bool wholeNumbers = false,
-            string label = null,
-            Func<float, string> valueFormatter = null,
-            Action<float> onApply = null,
-            Action<float> onChanged = null)
-        {
-            var item = new SliderSettingItem(configEntry, minValue, maxValue, wholeNumbers, label, valueFormatter, onApply, val =>
-            {
-                onChanged?.Invoke(val);
-                NotifyChangesMade();
-            });
-            AddItem(item);
-            return item;
-        }
-
-        public SliderSettingItem AddSlider(
-            ConfigEntry<int> configEntry,
-            int minValue,
-            int maxValue,
-            string label = null,
-            Func<float, string> valueFormatter = null,
-            Action<float> onApply = null,
-            Action<float> onChanged = null)
-        {
-            var item = new SliderSettingItem(configEntry, minValue, maxValue, label, valueFormatter, onApply, val =>
-            {
-                onChanged?.Invoke(val);
-                NotifyChangesMade();
-            });
-            AddItem(item);
-            return item;
-        }
 
         public SliderSettingItem AddSlider(
             string id,
@@ -184,62 +131,26 @@ namespace ZUI.Settings
             return item;
         }
 
-        public DropdownSettingItem AddDropdown(
-            ConfigEntry<string> configEntry,
-            IList<string> options,
-            string label = null,
-            Action<int> onApply = null,
-            Action<int> onChanged = null)
-        {
-            var item = new DropdownSettingItem(configEntry, options, label, onApply, idx =>
-            {
-                onChanged?.Invoke(idx);
-                NotifyChangesMade();
-            });
-            AddItem(item);
-            return item;
-        }
-
-        public DropdownSettingItem AddDropdown(
-            ConfigEntry<int> configEntry,
-            IList<string> options,
-            string label = null,
-            Action<int> onApply = null,
-            Action<int> onChanged = null)
-        {
-            var item = new DropdownSettingItem(configEntry, options, label, onApply, idx =>
-            {
-                onChanged?.Invoke(idx);
-                NotifyChangesMade();
-            });
-            AddItem(item);
-            return item;
-        }
-
         public DropdownSettingItem AddDropdown<TEnum>(
-            ConfigEntry<TEnum> configEntry,
-            string label = null,
+            string id,
+            string label,
+            TEnum defaultValue = default,
             Action<TEnum> onApply = null,
             Action<TEnum> onChanged = null) where TEnum : struct, Enum
         {
             string[] names = Enum.GetNames(typeof(TEnum));
-            int currentIndex = Array.IndexOf(names, configEntry.Value.ToString());
+            int currentIndex = Array.IndexOf(names, defaultValue.ToString());
             if (currentIndex < 0) currentIndex = 0;
-
-            string id = "ZUI_Dropdown_" + configEntry.Definition.Section + "_" + configEntry.Definition.Key;
-            string displayLabel = string.IsNullOrEmpty(label) ? configEntry.Definition.Key : label;
 
             var item = new DropdownSettingItem(
                 id,
-                displayLabel,
+                label,
                 names,
                 currentIndex,
                 onApply: idx =>
                 {
                     if (Enum.TryParse<TEnum>(names[idx], out var parsed))
                     {
-                        configEntry.Value = parsed;
-                        configEntry.ConfigFile?.Save();
                         onApply?.Invoke(parsed);
                     }
                 },

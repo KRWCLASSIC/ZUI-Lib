@@ -1,5 +1,4 @@
 using System;
-using BepInEx.Configuration;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -18,7 +17,6 @@ namespace ZUI.Settings
 
         public bool HasPendingChanges => CurrentValue != PendingValue;
 
-        public ConfigEntry<bool> ConfigEntry { get; }
         public Action<bool> OnApply { get; set; }
         public Action<bool> OnChanged { get; set; }
 
@@ -36,21 +34,6 @@ namespace ZUI.Settings
             Label = label;
             CurrentValue = defaultValue;
             PendingValue = defaultValue;
-            OnApply = onApply;
-            OnChanged = onChanged;
-        }
-
-        public ToggleSettingItem(
-            ConfigEntry<bool> configEntry,
-            string label = null,
-            Action<bool> onApply = null,
-            Action<bool> onChanged = null)
-        {
-            ConfigEntry = configEntry;
-            Id = "ZUI_Toggle_" + configEntry.Definition.Section + "_" + configEntry.Definition.Key;
-            Label = string.IsNullOrEmpty(label) ? configEntry.Definition.Key : label;
-            CurrentValue = configEntry.Value;
-            PendingValue = configEntry.Value;
             OnApply = onApply;
             OnChanged = onChanged;
         }
@@ -108,11 +91,6 @@ namespace ZUI.Settings
             if (CurrentValue != PendingValue)
             {
                 CurrentValue = PendingValue;
-                if (ConfigEntry != null)
-                {
-                    ConfigEntry.Value = CurrentValue;
-                    ConfigEntry.ConfigFile?.Save();
-                }
                 OnApply?.Invoke(CurrentValue);
             }
         }

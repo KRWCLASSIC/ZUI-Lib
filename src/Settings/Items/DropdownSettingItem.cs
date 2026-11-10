@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using BepInEx.Configuration;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -21,8 +20,6 @@ namespace ZUI.Settings
 
         public bool HasPendingChanges => CurrentIndex != PendingIndex;
 
-        public ConfigEntry<string> StringConfigEntry { get; }
-        public ConfigEntry<int> IntConfigEntry { get; }
         public Action<int> OnApply { get; set; }
         public Action<int> OnChanged { get; set; }
 
@@ -41,43 +38,6 @@ namespace ZUI.Settings
             Label = label;
             if (options != null) Options.AddRange(options);
             CurrentIndex = Mathf.Clamp(defaultIndex, 0, Math.Max(0, Options.Count - 1));
-            PendingIndex = CurrentIndex;
-            OnApply = onApply;
-            OnChanged = onChanged;
-        }
-
-        public DropdownSettingItem(
-            ConfigEntry<string> configEntry,
-            IList<string> options,
-            string label = null,
-            Action<int> onApply = null,
-            Action<int> onChanged = null)
-        {
-            StringConfigEntry = configEntry;
-            Id = "ZUI_Dropdown_" + configEntry.Definition.Section + "_" + configEntry.Definition.Key;
-            Label = string.IsNullOrEmpty(label) ? configEntry.Definition.Key : label;
-            if (options != null) Options.AddRange(options);
-
-            int foundIndex = Options.IndexOf(configEntry.Value);
-            CurrentIndex = foundIndex >= 0 ? foundIndex : 0;
-            PendingIndex = CurrentIndex;
-            OnApply = onApply;
-            OnChanged = onChanged;
-        }
-
-        public DropdownSettingItem(
-            ConfigEntry<int> configEntry,
-            IList<string> options,
-            string label = null,
-            Action<int> onApply = null,
-            Action<int> onChanged = null)
-        {
-            IntConfigEntry = configEntry;
-            Id = "ZUI_Dropdown_" + configEntry.Definition.Section + "_" + configEntry.Definition.Key;
-            Label = string.IsNullOrEmpty(label) ? configEntry.Definition.Key : label;
-            if (options != null) Options.AddRange(options);
-
-            CurrentIndex = Mathf.Clamp(configEntry.Value, 0, Math.Max(0, Options.Count - 1));
             PendingIndex = CurrentIndex;
             OnApply = onApply;
             OnChanged = onChanged;
@@ -163,19 +123,6 @@ namespace ZUI.Settings
             if (HasPendingChanges)
             {
                 CurrentIndex = PendingIndex;
-
-                if (StringConfigEntry != null && CurrentIndex >= 0 && CurrentIndex < Options.Count)
-                {
-                    StringConfigEntry.Value = Options[CurrentIndex];
-                    StringConfigEntry.ConfigFile?.Save();
-                }
-
-                if (IntConfigEntry != null)
-                {
-                    IntConfigEntry.Value = CurrentIndex;
-                    IntConfigEntry.ConfigFile?.Save();
-                }
-
                 OnApply?.Invoke(CurrentIndex);
             }
         }

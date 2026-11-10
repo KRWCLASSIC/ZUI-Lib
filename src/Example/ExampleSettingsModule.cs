@@ -1,5 +1,8 @@
 using System;
 using System.Collections;
+using System.IO;
+using BepInEx;
+using BepInEx.Configuration;
 using UnityEngine;
 using ZUI.Core;
 using ZUI.Settings;
@@ -30,7 +33,7 @@ namespace ZUI.Example
 
             ZUISettings.AddText(
                 id: "zui_desc",
-                text: "Showcase of ZUI controls and BepInEx config binding.",
+                text: "Showcase of ZUI controls and callback handling.",
                 hexColor: "#CCCCCC"
             );
 
@@ -43,25 +46,31 @@ namespace ZUI.Example
                 hexColor: "#55FF99"
             );
 
-            var cfgToggle = Plugin.Instance.Config.Bind(
-                section: "Examples",
-                key: "ExampleSavedToggle",
-                defaultValue: true,
-                description: "Showcases BepInEx config persistence for toggles."
-            );
+            // Real BepInEx ConfigFile for showcase settings (saved to BepInEx/config/ZUI.Example.cfg)
+            var exampleConfig = new ConfigFile(Path.Combine(Paths.ConfigPath, "ZUI.Example.cfg"), true);
+            var autoHeal = exampleConfig.Bind("Gameplay", "AutoHeal", false, "Heals player over time");
+            var fovConfig = exampleConfig.Bind("Graphics", "FOV", 90f, "Camera field of view");
+            var qualityConfig = exampleConfig.Bind("Graphics", "Quality", ExampleQualityPreset.High, "Graphics Quality Preset");
 
-            // Bound Toggle (automatically saved to BepInEx .cfg)
-            ZUISettings.AddToggle(
-                configEntry: cfgToggle,
-                label: "Example Toggle (Saved to .cfg)"
-            );
-
-            // Standalone Toggle (callback only)
+            // Standalone Toggle (Simple callback)
             ZUISettings.AddToggle(
                 id: "zui_example_toggle_raw",
-                label: "Example Toggle (Callback only)",
-                defaultValue: false,
-                onApply: val => Plugin.Log.LogInfo($"[ZUI Example] Raw toggle applied: {val}")
+                label: "Example Toggle (Callback)",
+                defaultValue: true,
+                onApply: val => Plugin.Log.LogInfo($"[ZUI Example] Toggle applied: {val}")
+            );
+
+            // Real BepInEx Config Toggle
+            ZUISettings.AddToggle(
+                id: "mymod_autoheal",
+                label: "Auto-Heal (Real BepInEx Config)",
+                defaultValue: autoHeal.Value,
+                onApply: val =>
+                {
+                    autoHeal.Value = val;
+                    exampleConfig.Save();
+                    Plugin.Log.LogInfo($"[ZUI Example] Saved to BepInEx config: AutoHeal = {val}");
+                }
             );
 
             // 3. Category: Sliders
@@ -73,20 +82,16 @@ namespace ZUI.Example
                 hexColor: "#FFAA33"
             );
 
-            var cfgInteger = Plugin.Instance.Config.Bind(
-                section: "Examples",
-                key: "ExampleSavedInteger",
-                defaultValue: 42,
-                description: "Showcases BepInEx config persistence for integers."
-            );
-
-            // Bound Integer Slider (0 - 100)
+            // Integer Slider (0 - 100)
             ZUISettings.AddSlider(
-                configEntry: cfgInteger,
+                id: "zui_example_integer",
+                label: "Example Integer",
                 minValue: 0,
                 maxValue: 100,
-                label: "Example Integer",
-                valueFormatter: v => $"{v:0}"
+                defaultValue: 42,
+                wholeNumbers: true,
+                valueFormatter: v => $"{v:0}",
+                onApply: val => Plugin.Log.LogInfo($"[ZUI Example] Integer applied: {val:0}")
             );
 
             // Decimal Slider (floating point precision)
@@ -125,6 +130,23 @@ namespace ZUI.Example
                 onApply: val => Plugin.Log.LogInfo($"[ZUI Example] Percentage applied: {val:0}%")
             );
 
+            // Real BepInEx Config Slider
+            ZUISettings.AddSlider(
+                id: "mymod_fov",
+                label: "FOV Slider (Real BepInEx Config)",
+                minValue: 60f,
+                maxValue: 120f,
+                defaultValue: fovConfig.Value,
+                wholeNumbers: true,
+                valueFormatter: v => $"{v:0}°",
+                onApply: val =>
+                {
+                    fovConfig.Value = val;
+                    exampleConfig.Save();
+                    Plugin.Log.LogInfo($"[ZUI Example] Saved to BepInEx config: FOV = {val}");
+                }
+            );
+
             // 4. Category: Dropdowns
             ZUISettings.AddSpace(height: 20f);
 
@@ -135,18 +157,26 @@ namespace ZUI.Example
             );
             ZUISettings.AddSpace(height: 10f);
 
-            var cfgDropdown = Plugin.Instance.Config.Bind(
-                section: "Examples",
-                key: "ExampleSavedOption",
-                defaultValue: "Option 2",
-                description: "Showcases BepInEx config persistence for dropdown selections."
+            // Standalone Dropdown
+            ZUISettings.AddDropdown(
+                id: "zui_example_dropdown",
+                label: "Example Dropdown",
+                options: new[] { "Option 1", "Option 2", "Option 3" },
+                defaultIndex: 1,
+                onApply: idx => Plugin.Log.LogInfo($"[ZUI Example] Dropdown option applied: index {idx}")
             );
 
-            // Bound Dropdown (automatically saved to BepInEx .cfg)
-            ZUISettings.AddDropdown(
-                configEntry: cfgDropdown,
-                options: new[] { "Option 1", "Option 2", "Option 3" },
-                label: "Example Dropdown"
+            // Real BepInEx Config Enum Dropdown
+            ZUISettings.AddDropdown<ExampleQualityPreset>(
+                id: "mymod_quality_preset",
+                label: "Quality Preset (Real BepInEx Config)",
+                defaultValue: qualityConfig.Value,
+                onApply: val =>
+                {
+                    qualityConfig.Value = val;
+                    exampleConfig.Save();
+                    Plugin.Log.LogInfo($"[ZUI Example] Saved to BepInEx config: Quality Preset = {val}");
+                }
             );
 
             // 5. Category: Buttons, Popups & Dialogs
@@ -275,5 +305,13 @@ namespace ZUI.Example
                 Popups.ZUIPopup.Close(loadingPopup);
             }
         }
+    }
+
+    public enum ExampleQualityPreset
+    {
+        Low,
+        Medium,
+        High,
+        Ultra
     }
 }

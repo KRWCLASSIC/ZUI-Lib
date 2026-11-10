@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using BepInEx;
-using BepInEx.Configuration;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -42,17 +41,6 @@ namespace ZUI.Settings
         #region Registration API
 
         public static ToggleSettingItem AddToggle(
-            ConfigEntry<bool> configEntry,
-            string label = null,
-            Action<bool> onApply = null,
-            Action<bool> onChanged = null)
-        {
-            var item = _container.AddToggle(configEntry, label, onApply, onChanged);
-            InstallItemIfOpen(item);
-            return item;
-        }
-
-        public static ToggleSettingItem AddToggle(
             string id,
             string label,
             bool defaultValue,
@@ -60,35 +48,6 @@ namespace ZUI.Settings
             Action<bool> onChanged = null)
         {
             var item = _container.AddToggle(id, label, defaultValue, onApply, onChanged);
-            InstallItemIfOpen(item);
-            return item;
-        }
-
-        public static SliderSettingItem AddSlider(
-            ConfigEntry<float> configEntry,
-            float minValue,
-            float maxValue,
-            bool wholeNumbers = false,
-            string label = null,
-            Func<float, string> valueFormatter = null,
-            Action<float> onApply = null,
-            Action<float> onChanged = null)
-        {
-            var item = _container.AddSlider(configEntry, minValue, maxValue, wholeNumbers, label, valueFormatter, onApply, onChanged);
-            InstallItemIfOpen(item);
-            return item;
-        }
-
-        public static SliderSettingItem AddSlider(
-            ConfigEntry<int> configEntry,
-            int minValue,
-            int maxValue,
-            string label = null,
-            Func<float, string> valueFormatter = null,
-            Action<float> onApply = null,
-            Action<float> onChanged = null)
-        {
-            var item = _container.AddSlider(configEntry, minValue, maxValue, label, valueFormatter, onApply, onChanged);
             InstallItemIfOpen(item);
             return item;
         }
@@ -122,37 +81,14 @@ namespace ZUI.Settings
             return item;
         }
 
-        public static DropdownSettingItem AddDropdown(
-            ConfigEntry<string> configEntry,
-            IList<string> options,
-            string label = null,
-            Action<int> onApply = null,
-            Action<int> onChanged = null)
-        {
-            var item = _container.AddDropdown(configEntry, options, label, onApply, onChanged);
-            InstallItemIfOpen(item);
-            return item;
-        }
-
-        public static DropdownSettingItem AddDropdown(
-            ConfigEntry<int> configEntry,
-            IList<string> options,
-            string label = null,
-            Action<int> onApply = null,
-            Action<int> onChanged = null)
-        {
-            var item = _container.AddDropdown(configEntry, options, label, onApply, onChanged);
-            InstallItemIfOpen(item);
-            return item;
-        }
-
         public static DropdownSettingItem AddDropdown<TEnum>(
-            ConfigEntry<TEnum> configEntry,
-            string label = null,
+            string id,
+            string label,
+            TEnum defaultValue = default,
             Action<TEnum> onApply = null,
             Action<TEnum> onChanged = null) where TEnum : struct, Enum
         {
-            var item = _container.AddDropdown(configEntry, label, onApply, onChanged);
+            var item = _container.AddDropdown(id, label, defaultValue, onApply, onChanged);
             InstallItemIfOpen(item);
             return item;
         }

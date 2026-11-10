@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using BepInEx.Configuration;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -224,40 +223,12 @@ namespace ZUI.Panels
         #region Fluent Widget Builder Extensions
 
         public ToggleSettingItem AddToggle(
-            ConfigEntry<bool> configEntry,
-            string label = null,
-            Action<bool> onApply = null,
-            Action<bool> onChanged = null)
-            => Container.AddToggle(configEntry, label, onApply, onChanged);
-
-        public ToggleSettingItem AddToggle(
             string id,
             string label,
             bool defaultValue,
             Action<bool> onApply = null,
             Action<bool> onChanged = null)
             => Container.AddToggle(id, label, defaultValue, onApply, onChanged);
-
-        public SliderSettingItem AddSlider(
-            ConfigEntry<float> configEntry,
-            float minValue,
-            float maxValue,
-            bool wholeNumbers = false,
-            string label = null,
-            Func<float, string> valueFormatter = null,
-            Action<float> onApply = null,
-            Action<float> onChanged = null)
-            => Container.AddSlider(configEntry, minValue, maxValue, wholeNumbers, label, valueFormatter, onApply, onChanged);
-
-        public SliderSettingItem AddSlider(
-            ConfigEntry<int> configEntry,
-            int minValue,
-            int maxValue,
-            string label = null,
-            Func<float, string> valueFormatter = null,
-            Action<float> onApply = null,
-            Action<float> onChanged = null)
-            => Container.AddSlider(configEntry, minValue, maxValue, label, valueFormatter, onApply, onChanged);
 
         public SliderSettingItem AddSlider(
             string id,
@@ -280,28 +251,13 @@ namespace ZUI.Panels
             Action<int> onChanged = null)
             => Container.AddDropdown(id, label, options, defaultIndex, onApply, onChanged);
 
-        public DropdownSettingItem AddDropdown(
-            ConfigEntry<string> configEntry,
-            IList<string> options,
-            string label = null,
-            Action<int> onApply = null,
-            Action<int> onChanged = null)
-            => Container.AddDropdown(configEntry, options, label, onApply, onChanged);
-
-        public DropdownSettingItem AddDropdown(
-            ConfigEntry<int> configEntry,
-            IList<string> options,
-            string label = null,
-            Action<int> onApply = null,
-            Action<int> onChanged = null)
-            => Container.AddDropdown(configEntry, options, label, onApply, onChanged);
-
         public DropdownSettingItem AddDropdown<TEnum>(
-            ConfigEntry<TEnum> configEntry,
-            string label = null,
+            string id,
+            string label,
+            TEnum defaultValue = default,
             Action<TEnum> onApply = null,
             Action<TEnum> onChanged = null) where TEnum : struct, Enum
-            => Container.AddDropdown(configEntry, label, onApply, onChanged);
+            => Container.AddDropdown(id, label, defaultValue, onApply, onChanged);
 
         public HeaderSettingItem AddHeader(string title) => Container.AddHeader(title);
         public HeaderSettingItem AddHeader(string title, Color color) => Container.AddHeader(title, color);
