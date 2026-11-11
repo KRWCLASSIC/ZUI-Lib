@@ -6,7 +6,7 @@ UI library for Zort mods.
 
 - Custom submenus and buttons in the Main Menu and Pause Menu
 - Standalone split screens without opening the vanilla pause menu
-- Custom right-panel cards and buttons in the pause menu
+- Custom right-panel cards with 3-zone layouts (leading icons, metadata, selection, action buttons)
 - Action buttons on player cards with volume slider auto-collapse
 - Mod settings modals styled like native settings
 - Custom popups, subtitles, and top banner notifications
@@ -42,13 +42,13 @@ umk setup
 ## Documentation
 
 API reference for each subsystem:
-- [Core](docs/Core.md) - Plugin info, module discovery, `ZUIAPI`, `ZUIImage`, `ZUICrashHandler`
-- [Main Menu](docs/MainMenu.md) - Custom buttons, submenus, pagination, and breadcrumbs
-- [Pause Menu](docs/PauseMenu.md) - Pause drawers, player card actions, right panels and cards
-- [Screens](docs/Screens.md) - Standalone custom split screens (`ZUIScreen`)
-- [Panels](docs/Panels.md) - Modal settings dialogs (`ZUIPanel`)
-- [Settings](docs/Settings.md) - Native InGameUI settings injection (`ZUISettings`)
-- [Popups](docs/Popups.md) - Dialogs, alerts, confirmations, and ESC handling (`ZUIPopup`)
-- [Notifications](docs/Notifications.md) - Top banner alerts (`ZUIInfoText`)
-- [Dialogue](docs/Dialogue.md) - Subtitles (`ZUISubtitle`) and sequences (`ZUIDialogueSequence`)
+- [Core](https://github.com/KRWCLASSIC/ZUI-Lib/blob/main/docs/Core.md) - Plugin info, module discovery, `ZUIAPI`, `ZUIImage`, `ZUICrashHandler`
+- [Main Menu](https://github.com/KRWCLASSIC/ZUI-Lib/blob/main/docs/MainMenu.md) - Custom buttons, submenus, pagination, and breadcrumbs
+- [Pause Menu](https://github.com/KRWCLASSIC/ZUI-Lib/blob/main/docs/PauseMenu.md) - Pause drawers, player card actions, right panels and cards
+- [Screens](https://github.com/KRWCLASSIC/ZUI-Lib/blob/main/docs/Screens.md) - Standalone custom split screens (`ZUIScreen`)
+- [Panels](https://github.com/KRWCLASSIC/ZUI-Lib/blob/main/docs/Panels.md) - Modal settings dialogs (`ZUIPanel`)
+- [Settings](https://github.com/KRWCLASSIC/ZUI-Lib/blob/main/docs/Settings.md) - Native InGameUI settings injection (`ZUISettings`)
+- [Popups](https://github.com/KRWCLASSIC/ZUI-Lib/blob/main/docs/Popups.md) - Dialogs, alerts, confirmations, and ESC handling (`ZUIPopup`)
+- [Notifications](https://github.com/KRWCLASSIC/ZUI-Lib/blob/main/docs/Notifications.md) - Top banner alerts (`ZUIInfoText`)
+- [Dialogue](https://github.com/KRWCLASSIC/ZUI-Lib/blob/main/docs/Dialogue.md) - Subtitles (`ZUISubtitle`) and sequences (`ZUIDialogueSequence`)
 

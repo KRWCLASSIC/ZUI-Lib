@@ -1,9 +1,9 @@
 {
     "name": "ZUI_Lib",
-    "version_number": "0.1.0",
-    "description": "Modular UI, split-screen layout, and menu library for Zort mods.",
+    "version_number": "0.1.1",
+    "description": "UI library for Zort mods.",
     "author": "KRW CLASSIC",
-    "website_url": "https://github.com/KRWCLASSIC/",
+    "website_url": "https://github.com/KRWCLASSIC/ZUI-Lib",
     "dependencies": [
         "BepInEx-BepInExPack-5.4.2100"
     ]

@@ -4,6 +4,6 @@ namespace ZUI
     {
         public const string PLUGIN_GUID = "mods.krwclassic.zuilib";
         public const string PLUGIN_NAME = "ZUI-Lib";
-        public const string PLUGIN_VERSION = "0.1.0";
+        public const string PLUGIN_VERSION = "0.1.1";
     }
 }

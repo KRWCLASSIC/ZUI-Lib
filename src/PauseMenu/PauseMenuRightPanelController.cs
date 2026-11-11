@@ -352,22 +352,40 @@ namespace ZUI.PauseMenu
 
             float height = Mathf.Max(24f, card.Height);
 
-            // Grab KickButton as template for right-side buttons, then destroy it after spawning
+            // Grab KickButton as template for action buttons, then destroy it after spawning
             Transform kickTransform = cardObj.transform.Find("KickButton");
             GameObject kickTemplate = kickTransform != null ? kickTransform.gameObject : null;
 
-            // Spawn Right-Aligned Action Buttons
             var spawnedHoverOnlyButtons = new List<GameObject>();
-            float currentRightX = -12f;
             float btnSize = Mathf.Clamp(height - 16f, 26f, 44f);
 
+            // 1. Spawn Left-Aligned Action Buttons
+            float currentLeftX = 12f;
+            for (int i = 0; i < card.LeftButtons.Count; i++)
+            {
+                var action = card.LeftButtons[i];
+                if (i > 0) currentLeftX += 6f;
+
+                float xCenter = currentLeftX + (btnSize * 0.5f);
+                GameObject actionBtnObj = CreateCardActionButton(cardObj.transform, kickTemplate, action, btnSize, xCenter, isLeft: true);
+                if (actionBtnObj != null && !action.AlwaysVisible)
+                {
+                    actionBtnObj.SetActive(false);
+                    spawnedHoverOnlyButtons.Add(actionBtnObj);
+                }
+
+                currentLeftX += btnSize;
+            }
+
+            // 2. Spawn Right-Aligned Action Buttons
+            float currentRightX = -12f;
             for (int i = 0; i < card.RightButtons.Count; i++)
             {
                 var action = card.RightButtons[i];
                 if (i > 0) currentRightX -= 6f;
 
                 float xCenter = currentRightX - (btnSize * 0.5f);
-                GameObject actionBtnObj = CreateCardRightButton(cardObj.transform, kickTemplate, action, btnSize, xCenter);
+                GameObject actionBtnObj = CreateCardActionButton(cardObj.transform, kickTemplate, action, btnSize, xCenter, isLeft: false);
                 if (actionBtnObj != null && !action.AlwaysVisible)
                 {
                     actionBtnObj.SetActive(false);
@@ -388,7 +406,7 @@ namespace ZUI.PauseMenu
                 hoverTracker.Initialize(spawnedHoverOnlyButtons);
             }
 
-            // Apply size, icon, and text visuals
+            // Apply size, icon, text, and selection visuals
             ApplyCardVisuals(card, cardObj);
 
             // Configure Whole-Card Click Action if provided
@@ -405,18 +423,25 @@ namespace ZUI.PauseMenu
                 cardBtn.transition = Selectable.Transition.ColorTint;
                 cardBtn.targetGraphic = bgImage;
 
-                Color baseColor = bgImage != null ? bgImage.color : new Color(0f, 0f, 0f, 0.78f);
-                if (bgImage != null)
-                {
-                    // Set base image color to white so Button ColorBlock drives the exact RGBA tint
-                    bgImage.color = Color.white;
-                }
+                Color defaultCardBg = new Color(0f, 0f, 0f, 0.78f);
+                Color selectedBg = card.SelectedColor ?? new Color(0.12f, 0.22f, 0.32f, 0.92f);
+                Color activeBg = card.BackgroundColor ?? (card.IsSelected ? selectedBg : defaultCardBg);
 
                 var cb = cardBtn.colors;
-                cb.normalColor = baseColor;
-                cb.highlightedColor = new Color(0.16f, 0.16f, 0.16f, 0.92f);
-                cb.pressedColor = new Color(0.24f, 0.24f, 0.24f, 0.96f);
-                cb.selectedColor = baseColor;
+                cb.normalColor = activeBg;
+                cb.selectedColor = activeBg;
+                cb.highlightedColor = new Color(
+                    Mathf.Clamp01(activeBg.r + 0.14f),
+                    Mathf.Clamp01(activeBg.g + 0.14f),
+                    Mathf.Clamp01(activeBg.b + 0.14f),
+                    Mathf.Clamp01(activeBg.a + 0.08f)
+                );
+                cb.pressedColor = new Color(
+                    Mathf.Clamp01(activeBg.r + 0.22f),
+                    Mathf.Clamp01(activeBg.g + 0.22f),
+                    Mathf.Clamp01(activeBg.b + 0.22f),
+                    1f
+                );
                 cardBtn.colors = cb;
 
                 cardBtn.onClick.AddListener(() =>
@@ -457,13 +482,70 @@ namespace ZUI.PauseMenu
             le.preferredHeight = height;
             le.flexibleHeight = 0f;
 
-            // Calculate reserved width on right side for action buttons
-            float btnSize = Mathf.Clamp(height - 16f, 26f, 44f);
-            float rightReserved = 12f + card.RightButtons.Count * (btnSize + 6f) + 16f;
+            // 1. Background & Selection Tinting
+            Color defaultCardBg = new Color(0f, 0f, 0f, 0.78f);
+            Color selectedBg = card.SelectedColor ?? new Color(0.12f, 0.22f, 0.32f, 0.92f);
+            Color activeBg = card.BackgroundColor ?? (card.IsSelected ? selectedBg : defaultCardBg);
 
-            // Configure Left Icon (PlayerIcon)
+            var bgImage = cardObj.GetComponent<Image>();
+            if (bgImage != null)
+            {
+                bgImage.color = activeBg;
+            }
+
+            var cardBtn = cardObj.GetComponent<Button>();
+            if (cardBtn != null)
+            {
+                var cb = cardBtn.colors;
+                cb.normalColor = activeBg;
+                cb.selectedColor = activeBg;
+                cb.highlightedColor = new Color(
+                    Mathf.Clamp01(activeBg.r + 0.14f),
+                    Mathf.Clamp01(activeBg.g + 0.14f),
+                    Mathf.Clamp01(activeBg.b + 0.14f),
+                    Mathf.Clamp01(activeBg.a + 0.08f)
+                );
+                cb.pressedColor = new Color(
+                    Mathf.Clamp01(activeBg.r + 0.22f),
+                    Mathf.Clamp01(activeBg.g + 0.22f),
+                    Mathf.Clamp01(activeBg.b + 0.22f),
+                    1f
+                );
+                cardBtn.colors = cb;
+            }
+
+            // 2. Escape Hatch: Mount CustomContentRoot if provided
+            if (card.CustomContentRoot != null)
+            {
+                var customRoot = card.CustomContentRoot;
+                if (customRoot.transform.parent != cardObj.transform)
+                {
+                    customRoot.transform.SetParent(cardObj.transform, false);
+                }
+                customRoot.SetActive(true);
+
+                if (card.CustomContentOnly)
+                {
+                    var iconT = cardObj.transform.Find("PlayerIcon");
+                    if (iconT != null) iconT.gameObject.SetActive(false);
+                    var nameT = cardObj.transform.Find("PlayerName");
+                    if (nameT != null) nameT.gameObject.SetActive(false);
+                    var rightTextT = cardObj.transform.Find("ZUI_RightText");
+                    if (rightTextT != null) rightTextT.gameObject.SetActive(false);
+                    return;
+                }
+            }
+
+            // 3. Leading Zone: Left Buttons + Icon
+            float btnSize = Mathf.Clamp(height - 16f, 26f, 44f);
+            float currentLeftX = 12f;
+            if (card.LeftButtons.Count > 0)
+            {
+                currentLeftX += card.LeftButtons.Count * (btnSize + 6f);
+            }
+
             Transform iconTransform = cardObj.transform.Find("PlayerIcon");
-            float textStartX = 24f;
+            float textStartX = currentLeftX + 4f;
 
             if (iconTransform != null)
             {
@@ -485,9 +567,9 @@ namespace ZUI.PauseMenu
                         iconRt.anchorMax = new Vector2(0f, 0.5f);
                         iconRt.pivot = new Vector2(0.5f, 0.5f);
                         iconRt.sizeDelta = new Vector2(iconSize, iconSize);
-                        iconRt.anchoredPosition = new Vector2(12f + iconSize * 0.5f, 0f);
+                        iconRt.anchoredPosition = new Vector2(currentLeftX + iconSize * 0.5f, 0f);
                     }
-                    textStartX = 12f + iconSize + 14f;
+                    textStartX = currentLeftX + iconSize + 14f;
                 }
                 else
                 {
@@ -495,14 +577,79 @@ namespace ZUI.PauseMenu
                 }
             }
 
-            // Configure Title + Optional Subtitle (PlayerName)
+            // 4. Trailing Zone: Right Buttons + RightText
+            float rightReserved = 12f;
+            if (card.RightButtons.Count > 0)
+            {
+                rightReserved += card.RightButtons.Count * (btnSize + 6f);
+            }
+
+            Transform rightTextTransform = cardObj.transform.Find("ZUI_RightText");
+            if (!string.IsNullOrEmpty(card.RightText))
+            {
+                TMP_Text rightTmp;
+                RectTransform rightRt;
+
+                if (rightTextTransform == null)
+                {
+                    var rightTextObj = new GameObject("ZUI_RightText");
+                    rightTextObj.transform.SetParent(cardObj.transform, false);
+                    rightRt = rightTextObj.AddComponent<RectTransform>();
+                    rightTmp = rightTextObj.AddComponent<TextMeshProUGUI>();
+                }
+                else
+                {
+                    rightTextTransform.gameObject.SetActive(true);
+                    rightRt = rightTextTransform as RectTransform;
+                    rightTmp = rightTextTransform.GetComponent<TMP_Text>();
+                }
+
+                if (rightTmp != null)
+                {
+                    rightTmp.richText = true;
+                    rightTmp.alignment = TextAlignmentOptions.MidlineRight;
+                    rightTmp.overflowMode = TextOverflowModes.Ellipsis;
+                    rightTmp.textWrappingMode = TextWrappingModes.NoWrap;
+                    rightTmp.fontSize = height < 54f ? 14f : 17f;
+
+                    string formattedRightText = card.RightText;
+                    if (!string.IsNullOrEmpty(card.RightTextHex))
+                    {
+                        formattedRightText = $"<color=#{card.RightTextHex.TrimStart('#')}>{formattedRightText}</color>";
+                    }
+                    else
+                    {
+                        formattedRightText = $"<color=#AAAAAA>{formattedRightText}</color>";
+                    }
+                    rightTmp.text = formattedRightText;
+
+                    float prefWidth = Mathf.Clamp(rightTmp.preferredWidth, 30f, 320f);
+
+                    if (rightRt != null)
+                    {
+                        rightRt.anchorMin = new Vector2(1f, 0.5f);
+                        rightRt.anchorMax = new Vector2(1f, 0.5f);
+                        rightRt.pivot = new Vector2(1f, 0.5f);
+                        rightRt.sizeDelta = new Vector2(prefWidth + 4f, height - 8f);
+                        rightRt.anchoredPosition = new Vector2(-rightReserved, 0f);
+                    }
+
+                    rightReserved += prefWidth + 14f;
+                }
+            }
+            else if (rightTextTransform != null)
+            {
+                rightTextTransform.gameObject.SetActive(false);
+            }
+
+            // 5. Center Zone: Title + Subtitle (PlayerName)
             Transform nameTransform = cardObj.transform.Find("PlayerName");
             if (nameTransform != null)
             {
                 var nameRt = nameTransform as RectTransform;
                 var nameTmp = nameTransform.GetComponent<TMP_Text>();
 
-                float availableTextWidth = Mathf.Max(100f, 989f - textStartX - rightReserved);
+                float availableTextWidth = Mathf.Max(60f, 989f - textStartX - rightReserved - 10f);
 
                 if (nameRt != null)
                 {
@@ -518,10 +665,7 @@ namespace ZUI.PauseMenu
                     nameTmp.richText = true;
                     nameTmp.alignment = TextAlignmentOptions.MidlineLeft;
                     nameTmp.overflowMode = TextOverflowModes.Ellipsis;
-                    nameTmp.textWrappingMode = height >= 84f ? TextWrappingModes.Normal : TextWrappingModes.NoWrap;
-
-                    float baseFontSize = height < 54f ? Mathf.Clamp(height * 0.48f, 15f, 24f) : 26f;
-                    nameTmp.fontSize = baseFontSize;
+                    nameTmp.textWrappingMode = TextWrappingModes.NoWrap;
 
                     string formattedTitle = card.Title ?? string.Empty;
                     if (!string.IsNullOrEmpty(card.TitleHex))
@@ -531,33 +675,33 @@ namespace ZUI.PauseMenu
 
                     if (!string.IsNullOrEmpty(card.Subtitle))
                     {
+                        // 2-line layout: calibrated font size + line-height=85% prevents bottom clipping
+                        float baseFontSize = height < 54f ? 16f : 21f;
+                        nameTmp.fontSize = baseFontSize;
+
                         string subColor = !string.IsNullOrEmpty(card.SubtitleHex)
                             ? $"#{card.SubtitleHex.TrimStart('#')}"
                             : "#AAAAAA";
 
-                        if (height >= 58f)
-                        {
-                            nameTmp.text = $"{formattedTitle}\n<size=72%><color={subColor}>{card.Subtitle}</color></size>";
-                        }
-                        else
-                        {
-                            nameTmp.text = $"{formattedTitle}   <size=80%><color={subColor}>{card.Subtitle}</color></size>";
-                        }
+                        nameTmp.text = $"{formattedTitle}\n<line-height=85%><size=72%><color={subColor}>{card.Subtitle}</color></size></line-height>";
                     }
                     else
                     {
+                        float baseFontSize = height < 54f ? 18f : 23f;
+                        nameTmp.fontSize = baseFontSize;
                         nameTmp.text = formattedTitle;
                     }
                 }
             }
         }
 
-        private static GameObject CreateCardRightButton(
+        private static GameObject CreateCardActionButton(
             Transform cardTransform,
             GameObject kickTemplate,
             PauseMenuRightCardAction action,
             float btnSize,
-            float xCenter)
+            float xCenter,
+            bool isLeft = false)
         {
             if (kickTemplate == null)
             {
@@ -566,14 +710,15 @@ namespace ZUI.PauseMenu
             }
 
             GameObject btnObj = UnityEngine.Object.Instantiate(kickTemplate, cardTransform);
-            btnObj.name = $"ZUI_CardBtn_{action.Id}";
+            btnObj.name = isLeft ? $"ZUI_CardLeftBtn_{action.Id}" : $"ZUI_CardBtn_{action.Id}";
             btnObj.SetActive(false);
 
             var rect = btnObj.GetComponent<RectTransform>();
             if (rect != null)
             {
-                rect.anchorMin = new Vector2(1f, 0.5f);
-                rect.anchorMax = new Vector2(1f, 0.5f);
+                float anchorX = isLeft ? 0f : 1f;
+                rect.anchorMin = new Vector2(anchorX, 0.5f);
+                rect.anchorMax = new Vector2(anchorX, 0.5f);
                 rect.pivot = new Vector2(0.5f, 0.5f);
                 rect.sizeDelta = new Vector2(btnSize, btnSize);
                 rect.anchoredPosition = new Vector2(xCenter, 0f);
@@ -610,7 +755,7 @@ namespace ZUI.PauseMenu
                 catch (Exception ex)
                 {
                     ZUICrashHandler.HandleException(ex, $"PauseMenuRightCardAction '{action.Id}'", action.OnClick?.Method?.DeclaringType?.Assembly);
-                    Plugin.Log.LogError($"[PauseMenuRightPanel] Error in card right button '{action.Id}': {ex}");
+                    Plugin.Log.LogError($"[PauseMenuRightPanel] Error in card button '{action.Id}': {ex}");
                 }
             });
 

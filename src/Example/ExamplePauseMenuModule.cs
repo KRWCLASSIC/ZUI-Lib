@@ -421,25 +421,29 @@ namespace ZUI.Example
                 if (cardBlue != null)
                 {
                     bool eq = selectedCard == cardBlue;
-                    cardBlue.SetText("Default Blue", eq ? "[EQUIPPED]" : "Click to equip");
+                    cardBlue.SetSelected(eq);
+                    cardBlue.SetText("Default Blue", eq ? "Equipped" : "Click to equip");
                     cardBlue.SetRightButtonColors("equip_blue", eq ? EquippedBtnHex : UnequippedBtnHex, eq ? EquippedHoverHex : UnequippedHoverHex);
                 }
                 if (cardRed != null)
                 {
                     bool eq = selectedCard == cardRed;
-                    cardRed.SetText("Red", eq ? "[EQUIPPED]" : "Click to equip");
+                    cardRed.SetSelected(eq);
+                    cardRed.SetText("Red", eq ? "Equipped" : "Click to equip");
                     cardRed.SetRightButtonColors("equip_red", eq ? EquippedBtnHex : UnequippedBtnHex, eq ? EquippedHoverHex : UnequippedHoverHex);
                 }
                 if (cardYellow != null)
                 {
                     bool eq = selectedCard == cardYellow;
-                    cardYellow.SetText("Yellow", eq ? "[EQUIPPED]" : "Click to equip");
+                    cardYellow.SetSelected(eq);
+                    cardYellow.SetText("Yellow", eq ? "Equipped" : "Click to equip");
                     cardYellow.SetRightButtonColors("equip_yellow", eq ? EquippedBtnHex : UnequippedBtnHex, eq ? EquippedHoverHex : UnequippedHoverHex);
                 }
                 if (cardGreen != null)
                 {
                     bool eq = selectedCard == cardGreen;
-                    cardGreen.SetText("Green", eq ? "[EQUIPPED]" : "Click to equip");
+                    cardGreen.SetSelected(eq);
+                    cardGreen.SetText("Green", eq ? "Equipped" : "Click to equip");
                     cardGreen.SetRightButtonColors("equip_green", eq ? EquippedBtnHex : UnequippedBtnHex, eq ? EquippedHoverHex : UnequippedHoverHex);
                 }
 
@@ -448,16 +452,18 @@ namespace ZUI.Example
 
             Sprite circleIndicatorIcon = ExampleIcons.CreateCircleIndicatorIcon(44, Color.white);
 
-            // --- Style 1: Player-Bar Card Elements (72px height, icon, subtitle, whole-card click + right circle status button) ---
+            // --- Style 1: Player-Bar Card Elements (72px height, 3-zone layout with RightText, selection, and action buttons) ---
             cardBlue = rightPanel.AddCard(
                 id: "skin_blue",
                 title: "Default Blue",
-                subtitle: "[EQUIPPED]",
+                subtitle: "Equipped",
                 icon: ExampleIcons.CreateSkinIcon(44, new Color(0.31f, 0.76f, 0.97f)),
                 onClick: () => SelectSkin("Default Blue", cardBlue),
                 height: 72f,
                 titleHex: "#4FC3F7"
             );
+            cardBlue.SetSelected(true);
+            cardBlue.SetRightText("JohnnyPie21");
             cardBlue.AddRightButton(
                 id: "equip_blue",
                 icon: circleIndicatorIcon,
@@ -476,6 +482,7 @@ namespace ZUI.Example
                 height: 72f,
                 titleHex: "#EF5350"
             );
+            cardRed.SetRightText("Erne");
             cardRed.AddRightButton(
                 id: "equip_red",
                 icon: circleIndicatorIcon,
@@ -494,6 +501,7 @@ namespace ZUI.Example
                 height: 72f,
                 titleHex: "#FFD54F"
             );
+            cardYellow.SetRightText("Community");
             cardYellow.AddRightButton(
                 id: "equip_yellow",
                 icon: circleIndicatorIcon,
@@ -512,6 +520,7 @@ namespace ZUI.Example
                 height: 72f,
                 titleHex: "#81C784"
             );
+            cardGreen.SetRightText("Community");
             cardGreen.AddRightButton(
                 id: "equip_green",
                 icon: circleIndicatorIcon,

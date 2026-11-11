@@ -334,40 +334,71 @@ Base class of `PauseMenuRightCard` and `PauseMenuRightButton`.
 
 `public class PauseMenuRightCard : PauseMenuRightElement`
 
-Card styled like a player bar: optional icon, title, subtitle, row click and icon buttons on the right.
+Card styled like a player bar with a 3-zone layout:
+* **Leading Zone**: Left icon and optional left action buttons (`AddLeftButton`).
+* **Center Zone**: Title and subtitle with automatic line-height calibration and ellipsis truncation.
+* **Trailing Zone**: Right-side metadata text (`SetRightText`) and action buttons (`AddRightButton`).
+* **Selection & Tint**: Active item selection (`SetSelected`) and custom background coloring (`SetBackgroundColor`).
+* **Escape Hatch**: Mount custom UI hierarchies directly into the row (`AttachCustomContent`).
 
 `public const float DefaultCardHeight = 72f;`
 
 Constructor: `PauseMenuRightCard(PauseMenuRightPanel owner, string id, string title, string subtitle = null, Sprite icon = null, Action onClick = null, float height = DefaultCardHeight, string titleHex = null, string subtitleHex = null)`. Use `PauseMenuRightPanel.AddCard` instead of calling it.
 
-| Member | Type |
-|---|---|
-| `Title` | `string` |
-| `Subtitle` | `string` |
-| `TitleHex` | `string` |
-| `SubtitleHex` | `string` |
-| `Icon` | `Sprite` |
-| `OnClick` | `Action` |
-| `RightButtons` | `IReadOnlyList<PauseMenuRightCardAction>` (get only) |
+| Member | Type | Description |
+|---|---|---|
+| `Title` | `string` | Primary card title. |
+| `Subtitle` | `string` | Secondary subtitle text. |
+| `TitleHex` | `string` | Title color hex code. |
+| `SubtitleHex` | `string` | Subtitle color hex code. |
+| `RightText` | `string` | Metadata text on the right side (e.g. artist attribution). |
+| `RightTextHex` | `string` | RightText color hex code. |
+| `Icon` | `Sprite` | Left-side thumbnail/icon. |
+| `OnClick` | `Action` | Full-row click callback. |
+| `IsSelected` | `bool` | Whether the card is visually highlighted as active/equipped. |
+| `SelectedColor` | `Color?` | Custom tint applied when `IsSelected` is true (default dark slate). |
+| `BackgroundColor` | `Color?` | Explicit card background color override. |
+| `CustomContentRoot` | `GameObject` | Custom UI hierarchy mounted into the card row. |
+| `CustomContentOnly` | `bool` | If true, hides standard card elements to give full row ownership to `CustomContentRoot`. |
+| `LeftButtons` | `IReadOnlyList<PauseMenuRightCardAction>` | Action buttons placed in the Leading zone. |
+| `RightButtons` | `IReadOnlyList<PauseMenuRightCardAction>` | Action buttons placed in the Trailing zone. |
 
 ```csharp
 public PauseMenuRightCard SetHeight(float height);   // max(24, height)
 public PauseMenuRightCard SetText(string title, string subtitle = null);
 public PauseMenuRightCard SetIcon(Sprite icon);
+public PauseMenuRightCard SetRightText(string text, string hexColor = null);
+public PauseMenuRightCard SetSelected(bool selected, Color? customColor = null);
+public PauseMenuRightCard SetSelected(bool selected, string hexColor);
+public PauseMenuRightCard SetBackgroundColor(Color? color);
+public PauseMenuRightCard SetBackgroundColor(string hexColor);
+
+public PauseMenuRightCard AddLeftButton(string id, Sprite icon, string tooltip, Action onClick,
+    string hoverHex = "#4FC3F7", string normalHex = null, bool alwaysVisible = true);
+public PauseMenuRightCard SetLeftButtonColors(string id, string normalHex, string hoverHex = null);
+public PauseMenuRightCard SetLeftButtonIcon(string id, Sprite icon);
+
 public PauseMenuRightCard AddRightButton(string id, Sprite icon, string tooltip, Action onClick,
     string hoverHex = "#4FC3F7", string normalHex = null, bool alwaysVisible = true);
 public PauseMenuRightCard SetRightButtonColors(string id, string normalHex, string hoverHex = null);
 public PauseMenuRightCard SetRightButtonIcon(string id, Sprite icon);
+
+public PauseMenuRightCard AttachCustomContent(GameObject customRoot, bool replaceStandardContent = false);
 ```
 
-- `SetText`, `SetIcon`, `SetHeight`, `SetRightButtonColors` and `SetRightButtonIcon` update the card without rebuilding the panel. `SetText` replaces the subtitle with `null` if you omit it.
-- `AddRightButton` throws `ArgumentNullException` for an empty `id` or null `onClick`. It rebuilds the panel.
-- `SetRightButtonColors` leaves the hover color alone when `hoverHex` is `null`. An unknown `id` is ignored.
+- `SetText`, `SetIcon`, `SetHeight`, `SetRightText`, `SetSelected`, `SetBackgroundColor`, `SetLeftButtonColors`, `SetLeftButtonIcon`, `SetRightButtonColors`, and `SetRightButtonIcon` update the card without rebuilding the panel.
+- `AddLeftButton` and `AddRightButton` add an action button to the respective side. Passing `alwaysVisible: false` hides the button until the card is hovered.
+- `SetSelected(true)` highlights the card with a subtle dark accent tint (or custom color) without needing `[EQUIPPED]` bracket tags in the subtitle.
+- `AttachCustomContent` mounts a developer-supplied GameObject into the row as an escape hatch for custom widgets or custom layouts.
 
 ```csharp
-card.AddRightButton("equip_red", icon, "Equip Red", () => Equip("Red"), hoverHex: "#A5D6A7", normalHex: "#546E7A");
-card.SetText("Red", "[EQUIPPED]");
-card.SetRightButtonColors("equip_red", "#66BB6A", "#A5D6A7");
+var card = panel.AddCard("skin_red", "Red", "Click to equip", icon: skinIcon, onClick: () => Equip("Red"));
+card.SetRightText("Artist: Erne", "#AAAAAA");
+card.AddRightButton("skin_info", infoIcon, "Skin Info", () => ShowSkinDetails("Red"));
+
+// When equipped:
+card.SetSelected(true);
+card.SetText("Red", "Equipped");
 ```
 
 ### PauseMenuRightCardAction
