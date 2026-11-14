@@ -58,5 +58,10 @@ namespace ZUI
         {
             ZUIScreen.CloseActive();
         }
+
+        /// <summary>
+        /// Built-in procedural vector circle indicator icon for equip/radio buttons.
+        /// </summary>
+        public static UnityEngine.Sprite DefaultCircleIcon => ZUI.Core.ZUIDefaultIcons.CircleIndicator;
     }
 }

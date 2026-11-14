@@ -584,6 +584,9 @@ namespace ZUI.PauseMenu
                 rightReserved += card.RightButtons.Count * (btnSize + 6f);
             }
 
+            Transform nameTransform = cardObj.transform.Find("PlayerName");
+            var nameTmp = nameTransform != null ? nameTransform.GetComponent<TMP_Text>() : null;
+
             Transform rightTextTransform = cardObj.transform.Find("ZUI_RightText");
             if (!string.IsNullOrEmpty(card.RightText))
             {
@@ -596,6 +599,11 @@ namespace ZUI.PauseMenu
                     rightTextObj.transform.SetParent(cardObj.transform, false);
                     rightRt = rightTextObj.AddComponent<RectTransform>();
                     rightTmp = rightTextObj.AddComponent<TextMeshProUGUI>();
+                    if (nameTmp != null && nameTmp.font != null)
+                    {
+                        rightTmp.font = nameTmp.font;
+                        rightTmp.fontSharedMaterial = nameTmp.fontSharedMaterial;
+                    }
                 }
                 else
                 {
@@ -606,6 +614,12 @@ namespace ZUI.PauseMenu
 
                 if (rightTmp != null)
                 {
+                    if (rightTmp.font == null && nameTmp != null && nameTmp.font != null)
+                    {
+                        rightTmp.font = nameTmp.font;
+                        rightTmp.fontSharedMaterial = nameTmp.fontSharedMaterial;
+                    }
+
                     rightTmp.richText = true;
                     rightTmp.alignment = TextAlignmentOptions.MidlineRight;
                     rightTmp.overflowMode = TextOverflowModes.Ellipsis;
@@ -623,14 +637,32 @@ namespace ZUI.PauseMenu
                     }
                     rightTmp.text = formattedRightText;
 
-                    float prefWidth = Mathf.Clamp(rightTmp.preferredWidth, 30f, 320f);
+                    float prefWidth;
+                    try
+                    {
+                        // Pass unconstrained dimensions (2000f, 100f) because default single-argument GetPreferredValues
+                        // uses rectTransform.rect.width (which is 0 on a freshly created GameObject), causing TMP to wrap
+                        // immediately and measure only 1-2 characters (~30px) leading to "Jo..." truncation.
+                        Vector2 prefValues = rightTmp.GetPreferredValues(card.RightText, 2000f, 100f);
+                        float measuredWidth = prefValues.x;
+                        float estimatedWidth = card.RightText.Length * (rightTmp.fontSize * 0.68f);
+                        if (measuredWidth < card.RightText.Length * 4f)
+                        {
+                            measuredWidth = estimatedWidth;
+                        }
+                        prefWidth = Mathf.Clamp(measuredWidth, 30f, 320f);
+                    }
+                    catch
+                    {
+                        prefWidth = Mathf.Clamp(card.RightText.Length * (rightTmp.fontSize * 0.68f), 30f, 320f);
+                    }
 
                     if (rightRt != null)
                     {
                         rightRt.anchorMin = new Vector2(1f, 0.5f);
                         rightRt.anchorMax = new Vector2(1f, 0.5f);
                         rightRt.pivot = new Vector2(1f, 0.5f);
-                        rightRt.sizeDelta = new Vector2(prefWidth + 4f, height - 8f);
+                        rightRt.sizeDelta = new Vector2(prefWidth + 6f, height - 8f);
                         rightRt.anchoredPosition = new Vector2(-rightReserved, 0f);
                     }
 
@@ -643,11 +675,9 @@ namespace ZUI.PauseMenu
             }
 
             // 5. Center Zone: Title + Subtitle (PlayerName)
-            Transform nameTransform = cardObj.transform.Find("PlayerName");
             if (nameTransform != null)
             {
                 var nameRt = nameTransform as RectTransform;
-                var nameTmp = nameTransform.GetComponent<TMP_Text>();
 
                 float availableTextWidth = Mathf.Max(60f, 989f - textStartX - rightReserved - 10f);
 

@@ -450,7 +450,7 @@ namespace ZUI.Example
                 ZUIInfoText.Show($"Equipped Skin: {skinName}", 2.5f, drawOnTop: true);
             }
 
-            Sprite circleIndicatorIcon = ExampleIcons.CreateCircleIndicatorIcon(44, Color.white);
+            Sprite circleIndicatorIcon = ZUI.Core.ZUIDefaultIcons.CircleIndicator;
 
             // --- Style 1: Player-Bar Card Elements (72px height, 3-zone layout with RightText, selection, and action buttons) ---
             cardBlue = rightPanel.AddCard(

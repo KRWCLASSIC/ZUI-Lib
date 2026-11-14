@@ -41,7 +41,7 @@ All public types live in these namespaces: `ZUI`, `ZUI.Core`, `ZUI.Popups` (and 
 |---|---|
 | `PLUGIN_GUID` | `"mods.krwclassic.zuilib"` |
 | `PLUGIN_NAME` | `"ZUI-Lib"` |
-| `PLUGIN_VERSION` | `"0.1.0"` |
+| `PLUGIN_VERSION` | `"0.2.0"` |
 
 `Plugin` (namespace `ZUI`, extends `BaseUnityPlugin`):
 
@@ -105,10 +105,29 @@ Static class in namespace `ZUI`. Shortcuts for the open ZUI layers.
 | `static void ClosePauseMenu()` | Closes the pause menu |
 | `static void CloseActivePanel()` | Closes the active panel, if any |
 | `static void CloseActiveScreen()` | Closes the active screen, if any |
+| `static Sprite DefaultCircleIcon` | Built-in circular ring indicator icon for equip and radio buttons |
 
 ```csharp
 if (ZUIAPI.IsPanelOpen)
     ZUIAPI.CloseActivePanel();
+```
+
+## ZUIDefaultIcons
+
+Static class in `ZUI.Core`. Provides built-in procedural vector icons ready for use without packing extra image assets into your mod.
+
+| Member | Description |
+|---|---|
+| `static Sprite CircleIndicator` | Cached white circular ring + center dot icon (44x44). Ideal for equip toggles and radio buttons tintable via Button ColorBlock. |
+| `static Sprite CreateCircleIndicator(int size = 44, Color? ringColor = null)` | Generates or retrieves a cached circular indicator with custom size and base color. |
+| `static void ClearCache()` | Clears cached procedural default icon sprites. |
+
+```csharp
+// Fast 1-liner using the cached default white circle
+Sprite icon = ZUIDefaultIcons.CircleIndicator;
+
+// Add to card button
+card.AddRightButton("equip_skin", icon, "Equip", () => Equip());
 ```
 
 ## ZUIImage

@@ -42,7 +42,7 @@ umk setup
 ## Documentation
 
 API reference for each subsystem:
-- [Core](https://github.com/KRWCLASSIC/ZUI-Lib/blob/main/docs/Core.md) - Plugin info, module discovery, `ZUIAPI`, `ZUIImage`, `ZUICrashHandler`
+- [Core](https://github.com/KRWCLASSIC/ZUI-Lib/blob/main/docs/Core.md) - Plugin info, module discovery, `ZUIAPI`, `ZUIImage`, `ZUIDefaultIcons`, `ZUICrashHandler`
 - [Main Menu](https://github.com/KRWCLASSIC/ZUI-Lib/blob/main/docs/MainMenu.md) - Custom buttons, submenus, pagination, and breadcrumbs
 - [Pause Menu](https://github.com/KRWCLASSIC/ZUI-Lib/blob/main/docs/PauseMenu.md) - Pause drawers, player card actions, right panels and cards
 - [Screens](https://github.com/KRWCLASSIC/ZUI-Lib/blob/main/docs/Screens.md) - Standalone custom split screens (`ZUIScreen`)
