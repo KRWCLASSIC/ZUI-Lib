@@ -85,36 +85,6 @@ namespace ZUI
                 }
             );
 
-            zuiDrawer.AddButton(
-                id: "zui_lib_settings",
-                label: "Settings",
-                onClick: () =>
-                {
-                    ZUIPanel.Open("zui_lib_settings");
-                }
-            );
-
-            // Register official ZUI-Lib Type 2 Settings Panel
-            var zuiPanel = ZUIPanel.Register("zui_lib_settings", "ZUI-LIB SETTINGS");
-            zuiPanel.AddHeader("Core Preferences");
-            zuiPanel.AddToggle("zui_pref_verbose", "Verbose Logging", false, val =>
-            {
-                Log.LogInfo($"[ZUI-Lib] Verbose logging preference set to: {val}");
-            });
-            zuiPanel.AddSlider("zui_pref_ui_scale", "Interface Scale", 0.5f, 2.0f, 1.0f, valueFormatter: v => $"{v:F1}x");
-            zuiPanel.AddDivider();
-            zuiPanel.AddHeader("Diagnostics & Inspection");
-            zuiPanel.AddButton("zui_pref_dump", "Hierarchy Dump", "EXPORT", () =>
-            {
-                ZUI.Debug.ZUIDebug.DumpHierarchy();
-                ZUIPopup.ShowInfo(
-                    title: "Diagnostics Exported",
-                    message: "Full UI hierarchy and state have been dumped to BepInEx log.",
-                    buttonText: "OK",
-                    titleHex: "#64B5F6"
-                );
-            });
-
             // Register standard ZUI-Lib drawer on Pause Menu as well
             var zuiPauseDrawer = ZUIPauseMenu.RegisterSubmenu(
                 id: "zui_lib_pause_drawer",
@@ -134,15 +104,6 @@ namespace ZUI
                         buttonText: "Awesome",
                         titleHex: "#64B5F6"
                     );
-                }
-            );
-
-            zuiPauseDrawer.AddButton(
-                id: "zui_lib_pause_settings",
-                label: "Settings",
-                onClick: () =>
-                {
-                    ZUIPanel.Open("zui_lib_settings");
                 }
             );
 

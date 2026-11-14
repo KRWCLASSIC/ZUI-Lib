@@ -61,7 +61,7 @@ EnableExampleModules = true
 
 Default is `true`. Set it to `false` to skip every module whose namespace starts with `ZUI.Example`.
 
-On startup the plugin initializes the crash handler, Harmony patches, settings, panels, main menu, pause menu, screens and info text subsystems, registers its own "ZUI-Lib" drawers and settings panel, then loads modules.
+On startup the plugin initializes the crash handler, Harmony patches, settings, panels, main menu, pause menu, screens and info text subsystems, registers its own "ZUI-Lib" drawers, then loads modules.
 
 ## IZUIModule
 
